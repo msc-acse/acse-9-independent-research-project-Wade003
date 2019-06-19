@@ -1,0 +1,23 @@
+"WBS #","Name / Title",Type,"Start Date","End Date","Estimated Hours","Actual Hours","Percent Complete",Resources,Predecessors,Notes,Comments,"Task Color"
+1,"Model reduction using Long Short Term Memory neural networks",project,2019-06-03,2019-09-05,0,0,18.42,,,,,
+1.1,Wade,group,2019-06-03,2019-09-05,0,0,18.42,,,,,
+1.1.1,"Train a simple LSTM network for square wave",task,2019-06-03,2019-06-10,0,0,100,WADE,,,,blue2
+1.1.2,"Training finish for square wave",milestone,2019-06-10,2019-06-10,0,0,100,WADE,1.1.1,,,blue2
+1.1.3,"Test the perfomance of network",task,2019-06-10,2019-06-17,0,0,100,WADE,1.1.2,,,blue2
+1.1.4,"Testing finish",milestone,2019-06-17,2019-06-17,0,0,100,WADE,1.1.3,,,blue2
+1.1.5,"Make a detailed project plan",task,2019-06-11,2019-06-24,0,0,50,WADE,,,,blue2
+1.1.6,"Do some literature review for the project",task,2019-06-11,2019-06-24,0,0,30,WADE,,,,blue2
+1.1.7,"Submit the project plan",milestone,2019-06-27,2019-06-27,0,0,0,WADE,1.1.6,,,blue2
+1.1.8,"Installing linux system for IC-Ferst",task,2019-06-05,2019-06-12,0,0,100,WADE,,,,blue2
+1.1.9,"Generate snapshots on IC-Ferst",task,2019-06-28,2019-07-04,0,0,0,WADE,1.1.8,,,blue2
+1.1.10,"Generate ROM for snapshots(AE)",task,2019-07-08,2019-07-19,0,0,0,Gary,1.1.9,,,blue2
+1.1.11,"Using LSTM network train a light version",task,2019-07-08,2019-07-19,0,0,0,WADE,1.1.9,,,blue2
+1.1.12,"Model reduction",milestone,2019-07-22,2019-07-22,0,0,0,"WADE, Gary","1.1.10,1.1.11",,,blue2
+1.1.13,"Continuing read papers on LSTM and why GBR is used wider than LSTM",task,2019-07-01,2019-07-19,0,0,0,WADE,,,,blue2
+1.1.14,"Using LSTM to train the ROM and adjust the network to gain better performance",task,2019-07-24,2019-08-01,0,0,0,WADE,1.1.12,,,blue2
+1.1.15,"Explore combining LSTM with domain decompsition",task,2019-07-15,2019-08-01,0,0,0,WADE,,,,blue2
+1.1.16,"Question? Any other jobs on LINUX?",task,2019-06-18,2019-07-05,0,0,0,WADE,,,,red1
+1.1.17,"Testing the performance on LSTM combining Domain docompsition",task,2019-08-05,2019-08-22,0,0,0,WADE,1.1.14,,,blue2
+1.1.18,"Finish software part.",milestone,2019-08-23,2019-08-23,0,0,0,WADE,1.1.17,,,blue2
+1.1.19,"Writing final report.",task,2019-08-23,2019-09-05,0,0,0,WADE,,,,blue2
+1.1.20,"Prepare final presentation",task,2019-08-23,2019-09-05,0,0,0,WADE,,,,blue2
