@@ -1,0 +1,282 @@
+#
+reset
+graphics mode transparent
+set default element tri
+set echo off
+
+cd "D:/OneDrive - Imperial College London/_IC-FERST simulations/Optimisation/Testmodel01"
+
+from 2000 -2700 2100
+at 460 270 -20
+up -0.2607 0.469758 0.843414
+
+#{x1 = XXX1}
+#{y1 = YYY1}
+#{x2 = XXX2}
+#{y2 = YYY2}
+
+brick x 1000 y 1000 z 500
+create sphere radius 2000 
+create sphere radius 2100 
+
+move volume 2 3 x 200 y 0 z -1950 include_merged
+move volume all x 500 y 500 z -250
+
+surface 1 name "topsurf"
+surface 2 name "basesurf"
+surface 3 name "south"
+surface 4 name "west"
+surface 5 name "north"
+surface 6 name "east"
+
+sideset 1 add surface 1
+sideset 2 add surface 2
+sideset 3 add surface 3
+sideset 4 add surface 4
+sideset 5 add surface 5
+sideset 6 add surface 6
+
+webcut Volume 1  tool Body 3 
+webcut Volume 4  tool Body 2
+delete body 2 3
+
+volume 1 name "sandstone"
+body 1 name "sandstonebody"
+volume 4 name "mudstone"
+body 4 name "mudstonebody"
+volume 5 name "siltstone"
+body 5 name "siltstonebody"
+
+block 1 add body 1
+block 2 add body 4
+block 3 add body 5
+
+#{novbefore = NumVolumes()}
+
+import step "./step_files/_well01-surf1.step" heal
+import step "./step_files/_well01-surf2.step" heal
+import step "./step_files/_well01-surf3.step" heal
+import step "./step_files/_well01-surf4.step" heal
+import step "./step_files/_well01-surf5.step" heal
+import step "./step_files/_well01-surf6.step" heal
+
+body 6 to 11 scale X 20 Y 20 Z 1.0 
+body 6 to 11 move z -250
+
+create volume surface 29 30 32 heal keep
+create volume surface 30 31 33 heal keep
+create volume surface 31 29 34 heal keep
+delete body 6 to 11
+
+body 12 to 14 copy
+body 12 to 14 move x {x1} y {y1} z 0
+body 15 to 17 move x {x2} y {y2} z 0
+
+curve 58 61 64 rename "well01"
+curve 67 70 73 rename "well02"
+
+volume 12 name "well01_s1"
+volume 13 name "well01_s2"
+volume 14 name "well01_s3"
+volume 15 name "well02_s1"
+volume 16 name "well02_s2"
+volume 17 name "well02_s3"
+
+#{volstart = 18}
+set duplicate block elements on
+
+#{novbefore = NumVolumes()}
+webcut Volume all in body 1 tool Body 12 
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 4 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+#{novbefore = NumVolumes()}
+webcut Volume all in body 1 tool Body 13
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 5 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+#{novbefore = NumVolumes()}
+webcut Volume all in body 1 tool Body 14
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 6 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+
+#{novbefore = NumVolumes()}
+webcut Volume all in body 4 tool Body 12 
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 7 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+#{novbefore = NumVolumes()}
+webcut Volume all in body 4 tool Body 13
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 8 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+#{novbefore = NumVolumes()}
+webcut Volume all in body 4 tool Body 14
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 9 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+
+#{novbefore = NumVolumes()}
+webcut Volume all in body 5 tool Body 12 
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 10 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+#{novbefore = NumVolumes()}
+webcut Volume all in body 5 tool Body 13
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 11 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+#{novbefore = NumVolumes()}
+webcut Volume all in body 5 tool Body 14
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 12 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+
+sideset 7 add surface in sideset 1
+sideset 7 remove surface with area > 500
+sideset 1 remove surface all in sideset 7
+
+#{novbefore = NumVolumes()}
+webcut Volume all in body 1 tool Body 15 
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 13 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+#{novbefore = NumVolumes()}
+webcut Volume all in body 1 tool Body 16
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 14 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+#{novbefore = NumVolumes()}
+webcut Volume all in body 1 tool Body 17
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 15 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+
+#{novbefore = NumVolumes()}
+webcut Volume all in body 4 tool Body 15 
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 16 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+#{novbefore = NumVolumes()}
+webcut Volume all in body 4 tool Body 16
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 17 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+#{novbefore = NumVolumes()}
+webcut Volume all in body 4 tool Body 17
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 18 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+
+#{novbefore = NumVolumes()}
+webcut Volume all in body 5 tool Body 15 
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 19 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+#{novbefore = NumVolumes()}
+webcut Volume all in body 5 tool Body 16
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 20 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+#{novbefore = NumVolumes()}
+webcut Volume all in body 5 tool Body 17
+#{novafter = NumVolumes()}
+#{If (novafter > novbefore)}
+ block 21 add volume {volstart}
+ #{volstart = volstart + 1}
+#{Endif}
+
+sideset 8 add surface in sideset 1
+sideset 8 remove surface with area > 500
+sideset 1 remove surface all in sideset 8
+
+delete body 12 to 17
+
+#{novafter = NumVolumes()}
+#{blockstart = 22}
+
+block {blockstart} add curve well01 
+block {blockstart} add curve well01@A
+block {blockstart} add curve well01@B 
+block {blockstart} add curve well01@C 
+block {blockstart} add curve well01@D 
+block {blockstart} add curve well01@E 
+block {blockstart} add curve well01@F 
+block {blockstart} add curve well01@G 
+block {blockstart} add curve well01@H 
+block {blockstart} add curve well01@I
+#{blockstart = blockstart + 1}
+block {blockstart} add curve well02 
+block {blockstart} add curve well02@A
+block {blockstart} add curve well02@B 
+block {blockstart} add curve well02@C 
+block {blockstart} add curve well02@D 
+block {blockstart} add curve well02@E 
+block {blockstart} add curve well02@F 
+block {blockstart} add curve well02@G 
+block {blockstart} add curve well02@H 
+block {blockstart} add curve well02@I
+#{blockstart = blockstart + 1}
+
+
+set duplicate block elements off
+block 1 remove volume all in block 4 to 50
+block 2 remove volume all in block 5 to 50
+block 3 remove volume all in block 6 to 50
+
+#{ID = 100}
+#{loop(23)}
+  sideset {ID} name '{ID}'
+# {ID = ID+1}
+#{endloop}
+
+imprint all
+merge all
+
+volume 1 4 5 size 500
+mesh volume all
+
+export nastran "well01.bdf" block 22 overwrite
+export nastran "well02.bdf" block 23 overwrite
+
+delete block 22 23
+
+
+export mesh "optimodel.e" overwrite
+
+exit()

@@ -1,0 +1,8 @@
+# to open the opal schema in diamond
+diamond -s ../../schemas/opal.rng example.opal
+
+# to clear previous results
+rm -rf ensemble*
+
+# to run the python script 
+python ../../main.py example.opal

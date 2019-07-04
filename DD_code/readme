@@ -1,0 +1,9 @@
+from command prompt with directory the same one as where decomp.f90 is installed (and probably f2py.py):
+
+python2 -m numpy.f2py -c decomp_new.f90 -m decomp_new
+
+
+python2 -m numpy.f2py -c decomp_new.f90 -fbounds-check -ffpe-trap=invalid,zero,overflow -m decomp_new
+
+python2 f2py_new.py
+

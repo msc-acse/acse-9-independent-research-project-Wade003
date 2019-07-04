@@ -1,0 +1,13 @@
+# git ignore files
+
+*.pyc
+*~
+*.log
+*.status
+
+# spud files 
+spud/Makefile
+spud/libtool
+spud/src/tests/Makefile
+
+
