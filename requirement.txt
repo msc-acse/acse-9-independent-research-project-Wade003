@@ -1,11 +1,12 @@
-Keras                         2.2.4    
-Keras-Applications            1.0.8    
-Keras-Preprocessing           1.1.0
-numpy                         1.16.4
-scikit-learn                  0.20.3
-scipy                         1.2.2
-tensorflow                    1.14.0   
-tensorflow-estimator          1.14.0
-torch                         1.1.0    
-torchvision                   0.3.0
-vtk                           8.1.2
+python 2.7 (Recommand)
+numpy >= 1.16.4
+scipy >= 1.2.2
+matplotlib >= 3.1.0
+jupyter >= 1.0.0 (to run demo notebooks)
+Sphinx >= 1.8.5 (to compile documentation)
+Keras >= 2.2.4
+scikit-learn >= 0.20.3
+tensorflow >= 1.14.0
+torch >= 1.1.0
+torchvision >= 0.3.0
+vtk >= 8.1.2
