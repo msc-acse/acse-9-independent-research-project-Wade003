@@ -1,0 +1,11 @@
+Keras                         2.2.4    
+Keras-Applications            1.0.8    
+Keras-Preprocessing           1.1.0
+numpy                         1.16.4
+scikit-learn                  0.20.3
+scipy                         1.2.2
+tensorflow                    1.14.0   
+tensorflow-estimator          1.14.0
+torch                         1.1.0    
+torchvision                   0.3.0
+vtk                           8.1.2
