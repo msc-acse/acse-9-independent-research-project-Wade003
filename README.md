@@ -4,13 +4,41 @@ Its speed could enable real-time decision making and operational modelling.
 
 In this repository you can find the tools for reduced order modelling.
 
-Example problems are presented and solved, including:
- - A simple channel flow navier-stokes equation (see: demo/flow_past_cylinder_demo.ipynb)
- - A poisson equation (see: demo/poisson_temp_demo.ipynb)
- - A three component chemical reactions  equation coupled to the navier-stokes equation (see: demo/cylinder_rxn_demo.ipynb)
- - A radionuclide transport equation coupled to the navier-stokes equation (see: demo/radio_transport_demo.ipynb)
- - A radionuclide transport equation coupled to the shallow water equation (see: demo/hydrodynamics_demo.ipynb)
- - A method of manufactured solutions verification on the radionuclide transport problem (see: demo/MMS_transport/demo.ipynb)
+The follow test case are in this repository, including:
+ - A 1D square wave prediction by LSTM (see: test_cases/square_wave/square_wave_lstm.py)
+ - A 1D square wave training by DD-LSTM (see: test_cases/square_wave/square_wave_dd_lstm.py)
+ - A 2D flow past a cylinder test case using LSTM (see: test_cases/LSTM_fpc)
+ - A 2D flow past a cylinder test case using GPR (see: test_cases/GPR_fpc)
+ - A 2D flow past a cylinder test case using DD-LSTM (see: test_cases/DD_LSTM_fpc)
+ - A 2D flow past a cylinder test case using DD-LSTM (see: test_cases/DD_GPR_fpc)
+ 
+The test case for 3D problem is too large to be here. To run that test case, you need to:
+Install Putty (from: https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
+Install Xming (from: https://netix.dl.sourceforge.net/project/xming/Xming/6.9.0.31/Xming-6-9-0-31-setup.exe)
+Open Putty
+Set host name as: ese-theos.ese.ic.ac.uk
+Set Connection/SSH/X11, Enable X11 forwarding
+Open Putty and login
+Ask for account and password from e-mail: ys8718@ic.ac.uk
+After logging in:
+```bash
+  cd /data/wade/test/Opal-master/tests/
+  cd GPR_LSBU
+   export PYTHONPATH='/data/wade/test/multifluids_icferst-master/python:$PYTHONPATH'
+   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/data/wade/test/Opal-master/spud
+   export PATH="/data/wade/test/Opal-master/spud:$PATH"
+   diamond -s ../../schemas/opal.rng lsbu_gpr.opal
+```
+After editing the settings (or just use default)
+```bash
+   python2 ../../opal.py lsbu_gpr.opal
+```
+Finish running, see the visualization of result
+```bash
+   paraview
+```
+Open the nirom_replication.vtu and change the field from solid color to velocity.
+
  
 ## System requirement
 Linux.
@@ -35,9 +63,7 @@ Adding environment path for Opal and IC-Ferst
    export PYTHONPATH='/data/wade/test/multifluids_icferst-master/python:$PYTHONPATH'
    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/data/wade/test/Opal-master/spud
    export PATH="/data/wade/test/Opal-master/spud:$PATH"
-
 ```
-
 
 ## Dependencies
  The external libraries:
@@ -59,6 +85,25 @@ Adding environment path for Opal and IC-Ferst
 * __software__		- contains Opal (which is the major software I developed) and IC-Ferst (support to run the Opal)
 * __report__		- contains the final report, detailing this project's motivations, software design, analysis, and conclusions 
 * __test_cases__		- 1D square wave and 2D flow past a cylinder test cases
+
+## Instructions to run a test case
+In the root directory of this repository
+```bash 
+   diamond -s ../software/Opal-master/schemas/opal.rng fpc_nirom.opal
+```
+The file name(fpc_nirom.opal) should be changed to the opal file's name in another test case. As for the configuration of 2D problem, I recommend to remain the same; if you do need you change it and still want to test a 2D test case, you can change the nPOD in field\_name(Velocity) in svd\_type in compression. But too many or two small POD number would affect the performance.
+
+Another setting could be changed is to change the training method from LSTM to GPR. We using GPR, it needs further setting. The scaling bounds are 0 10. The constant value is 1. The constant bounds are 1e-3 1e3. The RBF length scale is 100. The RBF length scale bounds are 1e-2 1e2. Ctrl + s to save your settings.
+
+Run the model:
+```bash 
+   python2 ../software/Opal-master/opal.py fpc_nirom.opal
+```
+Visualize the result:
+```bash 
+   paraview
+```
+Open the nirom_replication.vtu files, Click apply, and click a dropbox showing solid colour, switch that to velocity. Then click a button to go to the second snapshots, click the re-scale button so you can see the result in reasonable colour. Then you can click play button to see the whole animation. If you want to see the original data, go to snapshots and open that in paraview.
 
 ## Author and Course Information
 __Author:__ Wade Song
