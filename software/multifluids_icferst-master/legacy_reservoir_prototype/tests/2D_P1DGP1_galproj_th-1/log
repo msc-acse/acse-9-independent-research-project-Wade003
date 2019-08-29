@@ -1,0 +1,7 @@
+ MESSAGE: Using default options for the linear solver: GMRES(30) + HYPRE
+Running the model
+H1 TOL= 0.01 , ERROR= 5.97508265992e-11
+H2 TOL= 0.01 , ERROR= 2.08137542845e-10
+H3 TOL= 0.01 , ERROR= 2.44541176104e-10
+P2 TOL= 100 , ERROR= 41.8135637301
+CWC works OK

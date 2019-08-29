@@ -1,0 +1,11 @@
+nirom timings (in seconds), recorded  on 15-08-2019 21:04:49
+reading in snapshots took: 1.49404
+compression (eigh) took:   13.2545
+nirom timings (in seconds), recorded  on 15-08-2019 21:41:27
+reading in snapshots took: 1.43026
+compression (eigh) took:   5.9798
+training the NN took:      546.647
+nirom timings (in seconds), recorded  on 18-08-2019 12:00:00
+reading in snapshots took: 1.04157
+compression (eigh) took:   5.15779
+training the NN took:      32598.6

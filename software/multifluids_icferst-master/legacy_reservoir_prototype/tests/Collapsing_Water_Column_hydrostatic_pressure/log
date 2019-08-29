@@ -1,0 +1,4 @@
+ MESSAGE: Using default options for the linear solver: GMRES(30) + HYPRE
+ MESSAGE: Using default options for the non-linear solver. Convergence check (Pressure) with a maximum of 20 its. For multiphase porous media VAD and automatic backtracking are on. The check is either Saturation, if multiphase, or the Tracer used.
+Running the model
+CWC works OK

@@ -1,0 +1,183 @@
+rm -f *.d.* fluidity.* ocvn
+rm -f flog.dat time_count tempfile CheckSparsityMatrix.dat filedim fvalues mirror_int_data.dat fort.*
+rm -f *.node *.bound *.ele *.face *.stat *.vtu
+rm -f mirror_new.dat matrixdump matrixdump.info
+rm -f *.ele *.bound *.face *.node *.edge
+rm -f src/*.msh
+rm -f *.d.* fluidity.* ocvn
+rm -f flog.dat time_count tempfile CheckSparsityMatrix.dat filedim fvalues mirror_int_data.dat fort.*
+rm -f *.node *.bound *.ele *.face *.stat *.vtu
+rm -f mirror_new.dat matrixdump matrixdump.info
+rm -f *.ele *.bound *.face *.node *.edge
+rm -f src/*.msh
+gmsh -3 src/3d_mesh.geo
+Info    : Running 'gmsh -3 src/3d_mesh.geo' [Gmsh 3.0.6, 1 node, max. 1 thread]
+Info    : Started on Wed Jun 12 02:36:56 2019
+Info    : Reading 'src/3d_mesh.geo'...
+Info    : Done reading 'src/3d_mesh.geo'
+Info    : Finalized high order topology of periodic connections
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Meshing curve 2 (Line)
+Info    : Meshing curve 3 (Line)
+Info    : Meshing curve 4 (Line)
+Info    : Meshing curve 7 (Line)
+Info    : Meshing curve 8 (Line)
+Info    : Meshing curve 9 (Line)
+Info    : Meshing curve 10 (Line)
+Info    : Meshing curve 12 (Line)
+Info    : Meshing curve 13 (Line)
+Info    : Meshing curve 17 (Line)
+Info    : Meshing curve 21 (Line)
+Info    : Done meshing 1D (0.000625 s)
+Info    : Meshing 2D...
+Info    : Meshing surface 5 (Ruled surface, MeshAdapt)
+Info    : Meshing surface 14 (Ruled surface, MeshAdapt)
+Info    : Meshing surface 18 (Ruled surface, MeshAdapt)
+Info    : Meshing surface 22 (Ruled surface, MeshAdapt)
+Info    : Meshing surface 26 (Ruled surface, MeshAdapt)
+Info    : Meshing surface 27 (Ruled surface, MeshAdapt)
+Info    : Done meshing 2D (0.008134 s)
+Info    : Meshing 3D...
+Info    : Delaunay Meshing 1 volumes with 1 connected components
+Info    : Meshing volume 1 (Delaunay)
+Delaunizing vertices...
+Delaunay seconds:  0.000835
+Creating surface mesh ...
+Surface mesh seconds:  0.000176
+Recovering boundaries...
+Boundary recovery seconds:  0.001788
+Removing exterior tetrahedra ...
+Exterior tets removal seconds:  2.9e-05
+Suppressing Steiner points ...
+Steiner suppression seconds:  0.000361
+Recovering Delaunayness...
+Delaunay recovery seconds:  0.000258
+Optimizing mesh...
+Optimization seconds:  8e-05
+
+Writing nodes.
+Writing elements.
+Writing faces.
+Writing edges.
+
+Output seconds:  7e-05
+Total running seconds:  0.003661
+
+Statistics:
+
+  Input points: 122
+  Input facets: 240
+  Input segments: 360
+  Input holes: 0
+  Input regions: 0
+
+  Mesh points: 127
+  Mesh tetrahedra: 212
+  Mesh faces: 544
+  Mesh edges: 458
+  Mesh faces on facets: 240
+  Mesh edges on segments: 360
+  Steiner points inside domain: 5
+
+Info    : 127 points 458 edges and 240 faces in the initial mesh
+Info    : Found region 1
+Info    : 0 points created - Worst tet radius is 0.828149 (PTS removed 0 0)
+Info    : 3D point insertion terminated (127 points created):
+Info    :  - 0 Delaunay cavities modified for star shapeness
+Info    :  - 0 points could not be inserted
+Info    :  - 212 tetrahedra created in 2.9e-05 sec. (7310344 tets/sec.)
+Info    : Done meshing 3D (0.014822 s)
+Info    : Optimizing 3D mesh...
+Info    : Optimizing volume 1
+Info    : Opti : STARTS with  6.25000E-04 QBAD  3.32062E-01 QAVG  5.53135E-01
+Info    : Opti : 0.00 < QUAL < 0.10 :         0 elements
+Info    : Opti : 0.10 < QUAL < 0.20 :         0 elements
+Info    : Opti : 0.20 < QUAL < 0.30 :         0 elements
+Info    : Opti : 0.30 < QUAL < 0.40 :        20 elements
+Info    : Opti : 0.40 < QUAL < 0.50 :        27 elements
+Info    : Opti : 0.50 < QUAL < 0.60 :       109 elements
+Info    : Opti : 0.60 < QUAL < 0.70 :        52 elements
+Info    : Opti : 0.70 < QUAL < 0.80 :         4 elements
+Info    : Opti : 0.80 < QUAL < 0.90 :         0 elements
+Info    : Opti : 0.90 < QUAL < 1.00 :         0 elements
+Info    : Opti : no ill-shaped tets in the mesh ;-)
+Info    : Opti : 0.00 < QUAL < 0.10 :         0 elements
+Info    : Opti : 0.10 < QUAL < 0.20 :         0 elements
+Info    : Opti : 0.20 < QUAL < 0.30 :         0 elements
+Info    : Opti : 0.30 < QUAL < 0.40 :        20 elements
+Info    : Opti : 0.40 < QUAL < 0.50 :        27 elements
+Info    : Opti : 0.50 < QUAL < 0.60 :       109 elements
+Info    : Opti : 0.60 < QUAL < 0.70 :        52 elements
+Info    : Opti : 0.70 < QUAL < 0.80 :         4 elements
+Info    : Opti : 0.80 < QUAL < 0.90 :         0 elements
+Info    : Opti : 0.90 < QUAL < 1.00 :         0 elements
+Info    : Done optimizing 3D mesh (0.000205 s)
+Info    : 127 vertices 584 elements
+Info    : Writing 'src/3d_mesh.msh'...
+Info    : Done writing 'src/3d_mesh.msh'
+Info    : Stopped on Wed Jun 12 02:36:56 2019
+gmsh -3 src/3d_mesh_f.geo
+Info    : Running 'gmsh -3 src/3d_mesh_f.geo' [Gmsh 3.0.6, 1 node, max. 1 thread]
+Info    : Started on Wed Jun 12 02:36:56 2019
+Info    : Reading 'src/3d_mesh_f.geo'...
+Info    : Done reading 'src/3d_mesh_f.geo'
+Info    : Finalized high order topology of periodic connections
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (extruded)
+Info    : Meshing curve 2 (extruded)
+Info    : Meshing curve 3 (extruded)
+Info    : Meshing curve 4 (extruded)
+Info    : Meshing curve 7 (extruded)
+Info    : Meshing curve 8 (extruded)
+Info    : Meshing curve 9 (extruded)
+Info    : Meshing curve 10 (extruded)
+Info    : Meshing curve 12 (extruded)
+Info    : Meshing curve 13 (extruded)
+Info    : Meshing curve 17 (extruded)
+Info    : Meshing curve 21 (extruded)
+Info    : Done meshing 1D (7.9e-05 s)
+Info    : Meshing 2D...
+Info    : Meshing surface 5 (extruded)
+Info    : Meshing surface 14 (extruded)
+Info    : Meshing surface 18 (extruded)
+Info    : Meshing surface 22 (extruded)
+Info    : Meshing surface 26 (extruded)
+Info    : Meshing surface 27 (extruded)
+Info    : Done meshing 2D (0.000806 s)
+Info    : Meshing 3D...
+Info    : Meshing volume 1 (extruded)
+Info    : Subdividing extruded mesh
+Info    : Swapping 0
+Info    : Remeshing surface 5
+Info    : Meshing surface 5 (extruded)
+Info    : Remeshing surface 14
+Info    : Meshing surface 14 (extruded)
+Info    : Remeshing surface 18
+Info    : Meshing surface 18 (extruded)
+Info    : Remeshing surface 22
+Info    : Meshing surface 22 (extruded)
+Info    : Remeshing surface 26
+Info    : Meshing surface 26 (extruded)
+Info    : Done meshing 3D (0.003005 s)
+Info    : Optimizing 3D mesh...
+Info    : Done optimizing 3D mesh (1.5e-05 s)
+Info    : 604 vertices 2720 elements
+Info    : Writing 'src/3d_mesh_f.msh'...
+Info    : Done writing 'src/3d_mesh_f.msh'
+Info    : Stopped on Wed Jun 12 02:36:56 2019
+ MESSAGE: Using default options for the linear solver: GMRES(30) + HYPRE
+First solving the analytical
+Positions:
+Foot of Rarefaction : 0.494729539058
+Head of Rarefaction : 0.411258803254
+Shock      : 0.631411679902
+Contact Discontinuity : 0.569558946504
+Regions:
+Region 1   : (1, 1, 0)
+Region 2   : RAREFACTION
+Region 3   : (0.30313017805064707, 0.42631942817849544, 0.92745262004895057)
+Region 4   : (0.30313017805064707, 0.26557371170530725, 0.92745262004895057)
+Region 5   : (0.1, 0.125, 0.0)
+Now running the numerical model
+Sod shock works OK

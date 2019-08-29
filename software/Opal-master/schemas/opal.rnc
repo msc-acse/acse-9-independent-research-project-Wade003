@@ -1,0 +1,596 @@
+include "spud_base.rnc"
+
+start =
+   (
+      ## This program is used to create importance maps by running the forward
+      ## model many times with different perturbations in the input.
+      element OPAL {
+             ## Select the simulation type
+             element opal_operation {
+                ## generate importance map
+                element importance_map{importance_map_options}|
+                ## Data Assimilation
+                element data_assimilation{
+                        ## less smooth solution with more emphasis on fitting the data.
+                        element fwd_input_file { anystring }
+                        }|
+                ## Non-Intrusive Reduced Order Model
+                 element nirom{ nirom_options} |
+                ## Data Assimilation with second order adjoint and ensembles
+                element second_order_da
+                        {
+                        ## Gamma is the annealing parameter for lambda, try 0.95.
+                        ## It works by adding a diffusion operator to diffuse the
+                        ## controls as far as the data assimilation is concerned
+                        ## Gamma anneals down the value of lambda every inverse
+                        ## iteration and thus reduce the value of the diffusion
+                        ## coefficient. Thus the inversion starts with smooth solutions
+                        ## and as the data assimilation progresses produced
+                        ## less smooth solution with more emphasis on fitting the data.
+                        element gamma { real },
+                        ## Gamma_step anneals lambda_step in a similar method as gamma anneals lambda.
+                        element gamma_step { real },
+                        ## Lambda is the magnitude of the starting regularisation
+                        ## or diffusion
+                        element lambda { real },
+                        ## This is the magnitude of diffusion added to the step-length damping
+                        ## which is not included in the gradient calculation.
+                        element lambda_step { real },
+                        ## Nu is the initial magnitude of the step length damping term.
+                        ## This is constantly adjusted to ensure the conjugate gradient
+                        ## solution method converges well.
+                        element nu { real },
+			## nits_CG is the number of Conjugate Gradient iterations.
+			element nits_CG { integer },
+                        ## nits_nonlinear is the number of global iterations used to solve
+                        ## the inverse problem e.g. data assimilation problem
+                        element nits_nonlinear { integer },
+                        ## nits_inner is the number of inner iterations used to adjust
+                        ## the step length damping without running more forward models.
+                        ## If nits_inner = 1, no inner iterations are performed.
+                        element nits_inner { integer },
+                        ## error_tolerance is the maximum difference in the controls before
+                        ## assuming convergence
+                        element error_tolerance { real },
+                        ## nits_precon number of iterations to be used in the
+                        ## SSOR pre-conditioner which treats the regularization and
+                        ## step length damping terms as the preconditioner
+                        element nits_precon { integer },
+                        ## Relaxation coefficient for the SSOR pre-conditioner.
+                        ## Suggest in [0.1,1.5] with 1.5 being overrelaxation (for easy problems)
+                        ## and 0.1 under-relaxation (for hard problems). With no knowledge of the
+                        ## problem use 1.0.
+                        element w_relax { real },
+                        ## inverse tolerance - maximum difference between two consecutive conjugate gradient
+                        ## iterations before assuming the approximate Hessian system has converged.
+                        element inverse_toler { real }
+                        }|
+                ## Genetic algorithms based on the DEAP library (deap.readthedocs.io) to optimise well positions
+                ## DEAP can usually be installed from the Ubuntu repositories. Otherwise install it from the official source.
+                element ga_optimisation
+                        {
+                        ## Output files are named according to this field. Non-standard
+                        ## characters in the simulation name should be avoided.
+                        element Output_filename {
+                           anystring
+                        },
+                        ## This is the path to the executable that is going to be used.
+                        ## For example: ./icferst
+                        element Executable {
+                           anystring
+                        },
+                        ## This is the input filename to be used. It has to include
+                        ## the path and also the extension. Example: ./test.mpml
+                        element Input_file {
+                           anystring
+                        },
+                        ## Options to decide when the algorithm should stop
+                        element convergence_settings{
+                            ## Specify here the maximum number of generations to be studied.
+                            ## When reached, the algorithm will stop.
+                            element Maximum_generations { integer },
+                            ## If the relative optimisation is not changing for more than 2
+                            ## generations below the threshold specified here the simulation will stop.
+                            ## Recommended 0.01; To disable, set it to a negative value.
+                            element Gradient_convergence { real },
+                            ## If the fitness is below (above if opmising) the specified number then stop the simulation.
+                            ##
+                            element Absolute_convergence { real }?
+                        },
+                        ## Specify here the path to the trelis executable as well as the input file that will be modified for the different
+                        ## scenarios, tipically a .jou file.
+                        element Trelis_integration{
+                            element trelis_path{ string },
+                            ##Path and name of the inout file for trelis.
+                            element trelis_input_file{ string }
+                        }?,
+                        ## Optimise input parameter.
+                        ## GA optimisation can also be used to modify IC-FERST input parameters.
+                        ## If this option is activated, the mpml file will be modify similarly to trelis files, i.e.
+                        ## a given patern in the variables will be sought in the mpml file and explored in different scenarios.
+                        ## If doing this, it is recommended to not optimise also well locations.
+                        element optimise_input { empty }?,
+                        ## Number of processors to run the ensembles. By default = 1.
+                        ## The parallelisation is done using the implementation of DEAP, which uses SCOOP.
+                        element Number_processors {
+                        integer,
+                        (
+                        ## If desired, the forward models can be run in parallel. Making each batch smaller but still using Number_processors as total.
+                        ## This is very useful if all the simulations will not fit in the available RAM or if the speed time between simulations
+                        ## can be very different and larger batches will be slowed down by the slowest simulation.
+                        ##
+                        ## WARNING THIS REQUIRES FLDECOMP TO BE INSTALLED
+                        element MPI_runs { integer }?
+                        ) }?,
+
+                        ## Specify here how many locations/wells are going to be considered
+                        element Locations_to_study{
+                            element value{ integer },
+                            ## Specify here the separation between locations to study to be respected.
+                            ## The locations to study will be separated by this distance, this is to ensure
+                            ## that locations that are non suitable, for example injector and producer separated by few meters
+                            ## are not considered.
+                            element Mind_the_gap{ integer }?,
+                            ## If selected, an initial guess will be considered in the first population.
+                            ## This severely helps the convergence and it is therefore highly recommended.
+                            ## Numbers have to be separated by commas and it has to coincide with the number of variables
+                            ## to be studied in the optimisation problem times number of locations to study.
+                            ## Example with 3 variables and two locations: 2, 3, 5, 20, 30, 50
+                            element Initial_guess { string }?
+                        },
+                        ## This is the population that each generation can have.
+                        ## Recommended to be a multiple of Number_processors.
+                        element Population_generation { integer },
+                        ## Probability of two members to "cross" and generate offspring.
+                        ## It has to be a number between 0 and 1. For example: 0.5
+                        element Breeding_probability {
+                            element value {real},
+                            ## By default the generation method is based on a randomise integer method.
+                            ## Here the user can specify a different method if required.
+                            ## The inputs are: TO BE DEVELOPED
+                            element Generation_method { python_code }?
+                         },
+                        ## Probability of an offspring to suffer from mutation. This is useful to expand the area of search
+                        ## and avoid local minima.
+                        ## It has to be a number between 0 and 1. For example: 0.25
+                        element Mutation_probability {
+                            element value {real},
+                            ## By default the mutation method is based on a randomise integer method.
+                            ## Here the user can specify a different method if required.
+                            ## The inputs are: instance and mutpb. It has tor return instance.
+                            ## Return is a list containing the new Variables values.
+                            element Mutation_method { python_code }?
+                         },
+                        ## Percentage area of search.
+                        ## This parameters, expressed in times one, specifies the area of search based on a percentage of the Min_limit and Max_limit
+                        ## of each variables. For example, if Min_limit = -1000 and Max_Limit = 1000, for a precision of 0.1 the area of search
+                        ## will be split in sections of 200, i.e. the associated variable will only have values that are multiples of 200.
+                        element Precision { real },
+                        ## The fitness function specifies the functional to optimise
+                        element Fitness{
+                            ## Select whether to minimise the functional or maximise it.
+                            element Optimisation{
+                                element Minimise{empty}|
+                                element Maximise{empty}
+                            },
+                            ## Specify here, the ids of all the boundaries that are producers, separated by commas or spaces
+                            element producer_ids{string},
+                            ## Specify here, the ids of all the boundaries that are injectors, separated by commas or spaces
+                            element injector_ids{string},
+                            ## If specified the written code will be used instead of the internal.
+                            ## In this code the user has access to: timeList, prod, inject, prod_temp, inject_temp and walltime (this latter is a real).
+                            ## These Numpy Arrays of size [Number of phases, # Time levels] (except timeList which is only [# Time Levels] ) are extracted from the .csv file and they combine all the production of a given phase
+                            ## through the producers/injectors,  i.e. prod = [phase1, [time 1, time 2, ...], phase2, [time 1, time 2, ...] ...].
+                            ## The user has to return a single value: val
+                            element python_function { python_code }?
+
+                        },
+                        ## Specify as many variables that you want to be considered for the optimisation
+                        ## For well location you may need: X, Y, Depth, inclination, orientation
+                        ## The parameters will need to link with the method to generate different wells.
+                        element GA_method{
+                            element Evolutionary_algorithm{
+                                ## This algorithm reproduce the simplest evolutionary algorithm as presented in chapter 7 of [Back2000]
+                                element eaSimple { empty }|
+                                ## mu – The number of individuals to select for the next generation
+                                ##
+                                ## lambda The number of children to produce at each generation.
+                                ##
+                                ## For more information https://deap.readthedocs.io/en/master/api/algo.html
+                                ##
+                                ## Recommended mu = 1/3 of population and lambda = 2/3
+                                ##
+                                ## It is important not to have a ratio of 1 of lambda:mu
+                                element eaMuCommaLambda {
+                                    element Mu{integer},
+                                    element Lambda{integer}
+                                }|
+                                ## mu – The number of individuals to select for the next generation.
+                                ## lambda_ – The number of children to produce at each generation.
+                                ## For more information https://deap.readthedocs.io/en/master/api/algo.html
+                                element eaMuPlusLambda {
+                                    element Mu{integer},
+                                    element Lambda{integer}
+                                }
+                           },
+                            ## A selection method has to be chosen to decide the best fitted of the offspring
+                            element Selection_method{
+                                ## Only the fittest survive
+                                element selBest{empty}|
+                                ## Selection based on the NSGA-II approach
+                                element selNSGA2{empty}|
+                                ## Selection based on the SPEA-II approach
+                                element selSPEA2{empty}
+                            },
+                            ## Use the Covariance Matrix Adaptation Evolution Strategy (CMA-ES) [Hansen2001]
+                            element Use_CMA{
+                                ## For example: 2 times the precision
+                                element centroid{integer},
+                                ## 1/5th of the domain (area of search) is recommended
+                                element sigma {integer}
+                            }?
+                        }?,
+
+                        ## Specify as many variables that you want to be considered for the optimisation
+                        ## For well location you may need: X, Y, Depth, inclination, orientation
+                        ## The parameters will need to link with the method to generate different wells.
+                        ##
+                        ## Pattern to look for in the input file to be modified. For example in the .jou file
+                        ## the X coordinate can be coded as XCORD. This has to include the number of the well location,
+                        ## if one well is present and here XCORD is specified, in the .jou file the pattern to look for will be XCORD1
+                        ##
+                        ## WARNING: CMA MAY NOT WORK PROPERLY WHEN USING ONE SINGLE VARIABLE
+                        element Variables{
+                            attribute name { string },
+                            attribute Variable_pattern {string},
+                            ## Minimum bound to be explored by the GA method.
+                            ##
+                            ## Make sure that the actual boundaries of the domain cannot be reached, a well exactly at the boundary may fail.
+                            element Min_limit { integer },
+                            ## Maximum bound to be explored by the GA method.
+                            ##
+                            ## Make sure that the actual boundaries of the domain cannot be reached, a well exactly at the boundary may fail.
+                            element Max_limit { integer },
+                            ## If the variable needs to be evaluated in the real space, for example 0.5; The only solution is to bring
+                            ## the variable to the integer space where it can be evaluated. The recommendation is to, for example, if the variable is
+                            ## evaluated between -1 and 1 to set the normaliser to 1000 and the min_limit and max_limit to -1000 and 1000 instead of -1 and 1.
+                            ##
+                            ## The normaliser will turn the variable into the real space when evaluating it.
+                            ##
+                            ## Otherwise this variable is by default 1.0 and will have no effect.
+                            element normaliser { integer }?
+                        }*,
+                        ## Lenght of the ranking of the best results to show after finishing. By default 10.
+                        element Hall_of_fame { integer }?
+                        }
+
+             }
+
+
+         }
+
+)
+
+importance_map_options =
+     ## a temporary option to avoid perturbing near / inside wells
+     element avoid_perturbing_near_wells {
+        comment
+     }?,
+
+     ## Output files are named according to this field. Non-standard
+     ## characters in the simulation name should be avoided.
+     element Output_filename {
+        anystring
+     },
+     ## This is the path to the executable that is going to be used.
+     ## For example: ./icferst
+     element Executable {
+        anystring
+     },
+     ## This is the input filename to be used. It has to include
+     ## the path and also the extension. Example: ./test.mpml
+     element Input_file {
+        anystring
+     },
+
+     ## Time-windows can be created to advance back in time in periods of time.
+     ## This is done to create the importance map and help to improve the quality of the importance map
+     ## in the next time-window.
+     ##
+     ## Specify here how the size of time-window period (time units).
+     ## Note: This will enforce the option dump_period in ICFERST, if not using adaptive time-step size, ensure that this is a multiple of the time-step size.
+     element Time_window {
+        real,
+           ## Enable this option to pass down G initial from a later time window to the current window.
+            element pass_down_ginit { comment }?
+     }?,
+     ## Enabling this option means that the same sequence of
+     ## random numbers will be used for an opal calculation.
+     ## This could be useful to study the effects of certain
+     ## options.
+     element random_seed { comment }?,
+
+     ## Enter details about the functional - currently you can choose between a functional
+     ## that is evaluated at the end of time or one that integrates over all time
+     element functional {
+           (## evaluate at the end of time
+           element end_time{comment}|
+           ## integrate over all time
+           element all_time{comment}),
+           ## this ensures that the integrand is squared in solving for the value of the functional
+           element square_integrand{comment}?,
+           (## Location of interest. The functional will be calculated at the node nearest
+           ## to this point. Give x y z.
+           element location_of_interest {
+                real_vector
+            }),
+           element type {(
+               element standard{comment}|
+               element geothermal_over_time{comment}
+            )},
+            ## This are the fields that the functional depends on. You can add as many as you require.
+            ## For example: PhaseVolumeFraction, Density, Pressure, Velocity, Permeability, etc.
+            element Functional_field {
+                attribute name { string },
+                ## Type of field. For example PhaseVolumeFraction is a scalar field.
+                element field_type {
+                (
+               element scalar_field{comment}|
+               element vector_field{comment}|
+               element tensor_field{comment}
+                )},
+               ## If relevant, which phase is of interest?
+               element phase{ integer}?
+               }+
+            },
+            (
+             ## This are the fields to study. You can add as many as you require.
+             ## For example: PhaseVolumeFraction, Density, Pressure, Velocity, Permeability, etc.
+             element Field_to_study {
+                attribute name { string },
+                 ## Type of field. For example PhaseVolumeFraction is a scalar field.
+                 element field_type {
+                     (
+                        element scalar_field{comment}|
+                        element vector_field{comment}|
+                        element tensor_field{comment}|
+                        element porous_media{
+                             (
+                                element scalar_field{comment}|
+                                element vector_field{comment}|
+                                element tensor_field{comment}
+                             )
+                         }
+                     )
+                 },
+                ## Number perturbation to induce to this field.
+                element perturbations_to_do {
+                   integer,(
+                ## Number of CPUs to use to run perturbation in parallel.
+                ## The number of perturbation will be rounded up to be multiple of this.
+                element parallel_processors {
+                   integer
+                    }?)
+                },
+                ## Perturbate the initial condition?.
+                ## If neither this nor the Boundary are selected this one is on by default.
+                element Initial_condition{comment}?,
+                ## Perturbate the boundary conditions?
+                element Boundary_condition{comment,
+                (
+                    ## Select which boundary conditions you want to perturbate.
+                    ## By default all the boundary conditions.
+                    element boundary_ids {
+                       integer_vector
+                    }?
+                )}?,
+                ## Apply Gram-Schmidt orthoganlisation to the initial conditions with
+                ## this option.
+                element Gram-Schmidt{comment}?,
+
+                ## Apply smoothing to the perturbations with this option. Enter the number
+                ## of smoothing sweeps. (One sweep and the information spreads out by one node,
+                ## two sweeps spreads out by two nodes etc.)
+                ## A possible rule: nSmooth = nNodes^(1/d)/4 .
+                element smoothing{
+                    integer
+                }?,
+                ## Feedback of importance map. Multiply the perturbed initial condition by the
+                ## current importance map (based on however many perturbations have been run at
+                ## this point). Enter an integer to determine after how many ensembles this should
+                ## begin (choose 0 for immediately, n for once n ensembles have run).
+                element use_G{
+                      integer
+                }?,
+
+                 (## This is the standard deviation of the normal distribution
+                 ## to perturbate the studied field. The perturbation can either
+                 ## or an absolute value. By default is relative and 0.01.
+                 element Sigma {
+                    real
+                 }|
+                 ## Python function to introduce the perturbation manually;
+                 ## The user has access to:
+                 ## field which is input/output and contains the values of the field of interest
+                 ## coordinates which are the coordinates
+                 ## The user has access to the python libraries.
+                 ## Example (NOTE that the code has to start with no indentations):
+                 ##
+                 ##     sigma = 0.01
+                 ##     mu = 0.
+                 ##     for i in range(field.shape[0]):
+                 ##          field[i] *= np.random.normal(mu, sigma)
+                 ##
+                 ##     #Simple smoothing step based on the distance to the node
+                 ##     field_copy = copy.deepcopy(field)
+                 ##     ref_dist = np.linalg.norm(np.amax(coordinates)-np.amin(coordinates))
+                 ##
+                 ##     for i in range(field.shape[0]):
+                 ##          for x in range(coordinates.shape[0]):
+                 ##               dist = np.linalg.norm(coordinates[i]-coordinates[x])
+                 ##               if (abs(dist) >1e-8 ):
+                 ##                    field[i] = field_copy[i] + field_copy[x]*max(0.5, ref_dist/dist)
+
+
+                 element python_function {python_code}
+                ),
+                 ## List of phases that are going to be perturbed for this field.
+                 element Phases_to_perturb {
+                   integer_vector
+                 },
+                ## Modifies the diagonal terms of the MTM matrix to assist
+                ## in inverting the matrix when it might be poorly conditioned.
+                ## Method 1, add_to_diag, (default) adds a small value to each
+                ## diagonal term (try 1e-8).
+                ## Method 2, constrain_evalue, specifies a lower bound for the
+                ## eigenvalues of MTM (try 1e-2).
+                element stabilise_through_diagonal {
+                         (
+                        element add_to_diag{comment}|
+                        element constrain_evalue{comment}
+                        ),
+                         (
+                        element epsilon {
+                                    real
+                                      }
+                        )
+
+                }?
+             }
+          )+
+
+
+
+nirom_options =
+   (
+    ## choose between generating snapshots and accessing pre-existing ones
+    element snapshots_create{comment,
+        ## Give the directory in which to put the snapshots
+        element path{anystring},
+        ## Give the path to the executable of the forward model
+        element executable{string},
+        ## Give the name of the input file of the forward model
+        element input_file{anystring}
+        }|
+    ## access pre-existing snapshots
+    element snapshots_location{comment,
+        ## Give the path to where the snapshots are stored
+        element path{anystring},
+        ## Give the name of the input file used to generate the snapshots
+        element input_file{anystring},
+        ## Give the name of the output files
+        element output_filebase{anystring}?,
+        ## Number of parameters
+        element nParameters{integer}?,
+        ## Give the filename extension of the snapshots
+        element extension{anystring}?
+    }
+   ),
+    (
+    ## Apply compression to the snapshots with an SVD, an auto-encoder or a mixture of both (svd-autoencoder)
+    element compression{comment,
+
+        ( ## Choose compression method: svd type (with svd or eigh) or auto-encoder type. There is
+          ## an option to include an auto-encoder with the svd type
+          element svd_type{comment,
+               ## svd method can be used for small problems (200,000 dofs and 20 snapshots), but
+               ## eigh is faster for larger problems.
+               (element eigh_method{comment}|
+                element svd_method{comment}|
+                element DD_eigh_method{comment,
+                    element num_sub_base_2{integer}
+                }
+               ),
+             #  (
+                ## Once the SVD has been calculated, send the POD variables through an auto-encoder.
+                element svd_autoencoder{comment,
+                    ## Similar to iteration number
+                    element number_epochs{integer},
+                    ## how many snapshots (inputs) should be used before updating the weights. The
+                    ## larger this number the faster to train the auto-encoder, but it might become
+                    ## less accurate
+                    element batch_size{integer},
+                    ## How many neurons there are in each layer - start with the number of nodes and
+                    ## end with the number of latent variables . (There is a default number of layers)
+                    element neurons_each_layer{integer_vector}
+                }?,
+                #),
+              ## Give the field name for which you want basis functions to be calculated.
+              element field_name {
+              attribute name { string },
+                 (## Give the fraction of information (energy) to be captured by
+                 ## the basis functions (eg. 0.99).
+                 element cumulative_tol{real}|
+                 ## Give the number of basis functions to be retained (from 1 up to
+                 ## the number of snapshots)
+                 element nPOD{integer}
+                 )   }+
+          }|
+          ## Choose compression method: svd type (with svd or eigh) or auto-encoder type. There is
+          ## an option to include an auto-encoder with the svd type
+          element autoencoder_type{comment,
+              element field_name {
+              attribute name { string },
+                 ## how many snapshots (inputs) should be used before updating the weights. The
+                 ## larger this number the faster to train the auto-encoder, but it might become
+                 ## less accurate
+                 element batch_size{ integer},
+                 ## Similar to iteration number
+                 element number_epochs{integer},
+                 ## How many neurons there are in each layer - start with the number of nodes and
+                 ## end with the number of latent variables . (There is a default number of layers)
+                 element neurons_each_layer{integer_vector}
+                 }+
+        }
+        )
+#        element field_name {
+#           attribute name { string },
+#              (## Give the fraction of information (energy) to be captured by
+#              ## the basis functions (eg. 0.99).
+#              element cumulative_tol{real}|
+#              ## Give the number of basis functions to be retained (from 1 up to
+#              ## the number of snapshots)
+#              element nPOD{integer}
+#              )   }+
+             }
+    )?,
+# to include another element try putting parentheses around choose compression method and above
+#    }),
+#    element placeholder{comment}
+#   )?,
+   (
+    ## training - choose between Gaussian Process Regression or LSTM
+    element training{comment,
+      ( ## scaling and hyperparameters (a constant kernel multiplies an RBF kernel)
+        element GPR{comment,
+            ## scaling of the data
+            element scaling_bounds{real_vector},
+            element constant_value{real},
+            element constant_bounds{real_vector},
+            element RBF_length_scale{real},
+            element RBF_length_scale_bounds{real_vector}
+        }|
+        element DD_GPR{comment,
+            ## scaling of the data
+            element scaling_bounds{real_vector},
+            element constant_value{real},
+            element constant_bounds{real_vector},
+            element RBF_length_scale{real},
+            element RBF_length_scale_bounds{real_vector}
+        }|
+        ## method - Choose between GPR and LSTM
+        element LSTM{comment}|
+
+        element DD_LSTM{comment}
+      )
+    }?
+   ),
+   (
+    ## prediction - not implemented yet
+    element prediction{comment,
+       ## number of time levels to predict over - this should be a positive integer
+       element nTime{integer}
+    }?
+   )
+#      ## tolerance for SVD truncation
+#      element cumulative_tol { real }

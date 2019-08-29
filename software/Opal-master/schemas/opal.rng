@@ -1,0 +1,903 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="">
+  <include href="spud_base.rng"/>
+  <start>
+    <element name="OPAL">
+      <a:documentation>This program is used to create importance maps by running the forward
+model many times with different perturbations in the input.</a:documentation>
+      <element name="opal_operation">
+        <a:documentation>Select the simulation type</a:documentation>
+        <choice>
+          <element name="importance_map">
+            <a:documentation>generate importance map</a:documentation>
+            <ref name="importance_map_options"/>
+          </element>
+          <element name="data_assimilation">
+            <a:documentation>Data Assimilation</a:documentation>
+            <element name="fwd_input_file">
+              <a:documentation>less smooth solution with more emphasis on fitting the data.</a:documentation>
+              <ref name="anystring"/>
+            </element>
+          </element>
+          <element name="nirom">
+            <a:documentation>Non-Intrusive Reduced Order Model</a:documentation>
+            <ref name="nirom_options"/>
+          </element>
+          <element name="second_order_da">
+            <a:documentation>Data Assimilation with second order adjoint and ensembles</a:documentation>
+            <element name="gamma">
+              <a:documentation>Gamma is the annealing parameter for lambda, try 0.95.
+It works by adding a diffusion operator to diffuse the
+controls as far as the data assimilation is concerned
+Gamma anneals down the value of lambda every inverse
+iteration and thus reduce the value of the diffusion
+coefficient. Thus the inversion starts with smooth solutions
+and as the data assimilation progresses produced
+less smooth solution with more emphasis on fitting the data.</a:documentation>
+              <ref name="real"/>
+            </element>
+            <element name="gamma_step">
+              <a:documentation>Gamma_step anneals lambda_step in a similar method as gamma anneals lambda.</a:documentation>
+              <ref name="real"/>
+            </element>
+            <element name="lambda">
+              <a:documentation>Lambda is the magnitude of the starting regularisation
+or diffusion</a:documentation>
+              <ref name="real"/>
+            </element>
+            <element name="lambda_step">
+              <a:documentation>This is the magnitude of diffusion added to the step-length damping
+which is not included in the gradient calculation.</a:documentation>
+              <ref name="real"/>
+            </element>
+            <element name="nu">
+              <a:documentation>Nu is the initial magnitude of the step length damping term.
+This is constantly adjusted to ensure the conjugate gradient
+solution method converges well.</a:documentation>
+              <ref name="real"/>
+            </element>
+            <element name="nits_CG">
+              <a:documentation>nits_CG is the number of Conjugate Gradient iterations.</a:documentation>
+              <ref name="integer"/>
+            </element>
+            <element name="nits_nonlinear">
+              <a:documentation>nits_nonlinear is the number of global iterations used to solve
+the inverse problem e.g. data assimilation problem</a:documentation>
+              <ref name="integer"/>
+            </element>
+            <element name="nits_inner">
+              <a:documentation>nits_inner is the number of inner iterations used to adjust
+the step length damping without running more forward models.
+If nits_inner = 1, no inner iterations are performed.</a:documentation>
+              <ref name="integer"/>
+            </element>
+            <element name="error_tolerance">
+              <a:documentation>error_tolerance is the maximum difference in the controls before
+assuming convergence</a:documentation>
+              <ref name="real"/>
+            </element>
+            <element name="nits_precon">
+              <a:documentation>nits_precon number of iterations to be used in the
+SSOR pre-conditioner which treats the regularization and
+step length damping terms as the preconditioner</a:documentation>
+              <ref name="integer"/>
+            </element>
+            <element name="w_relax">
+              <a:documentation>Relaxation coefficient for the SSOR pre-conditioner.
+Suggest in [0.1,1.5] with 1.5 being overrelaxation (for easy problems)
+and 0.1 under-relaxation (for hard problems). With no knowledge of the
+problem use 1.0.</a:documentation>
+              <ref name="real"/>
+            </element>
+            <element name="inverse_toler">
+              <a:documentation>inverse tolerance - maximum difference between two consecutive conjugate gradient
+iterations before assuming the approximate Hessian system has converged.</a:documentation>
+              <ref name="real"/>
+            </element>
+          </element>
+          <element name="ga_optimisation">
+            <a:documentation>Genetic algorithms based on the DEAP library (deap.readthedocs.io) to optimise well positions
+DEAP can usually be installed from the Ubuntu repositories. Otherwise install it from the official source.</a:documentation>
+            <element name="Output_filename">
+              <a:documentation>Output files are named according to this field. Non-standard
+characters in the simulation name should be avoided.</a:documentation>
+              <ref name="anystring"/>
+            </element>
+            <element name="Executable">
+              <a:documentation>This is the path to the executable that is going to be used.
+For example: ./icferst</a:documentation>
+              <ref name="anystring"/>
+            </element>
+            <element name="Input_file">
+              <a:documentation>This is the input filename to be used. It has to include
+the path and also the extension. Example: ./test.mpml</a:documentation>
+              <ref name="anystring"/>
+            </element>
+            <element name="convergence_settings">
+              <a:documentation>Options to decide when the algorithm should stop</a:documentation>
+              <element name="Maximum_generations">
+                <a:documentation>Specify here the maximum number of generations to be studied.
+When reached, the algorithm will stop.</a:documentation>
+                <ref name="integer"/>
+              </element>
+              <element name="Gradient_convergence">
+                <a:documentation>If the relative optimisation is not changing for more than 2
+generations below the threshold specified here the simulation will stop.
+Recommended 0.01; To disable, set it to a negative value.</a:documentation>
+                <ref name="real"/>
+              </element>
+              <optional>
+                <element name="Absolute_convergence">
+                  <a:documentation>If the fitness is below (above if opmising) the specified number then stop the simulation.
+</a:documentation>
+                  <ref name="real"/>
+                </element>
+              </optional>
+            </element>
+            <optional>
+              <element name="Trelis_integration">
+                <a:documentation>Specify here the path to the trelis executable as well as the input file that will be modified for the different
+scenarios, tipically a .jou file.</a:documentation>
+                <element name="trelis_path">
+                  <data type="string"/>
+                </element>
+                <element name="trelis_input_file">
+                  <a:documentation>Path and name of the inout file for trelis.</a:documentation>
+                  <data type="string"/>
+                </element>
+              </element>
+            </optional>
+            <optional>
+              <element name="optimise_input">
+                <a:documentation>Optimise input parameter.
+GA optimisation can also be used to modify IC-FERST input parameters.
+If this option is activated, the mpml file will be modify similarly to trelis files, i.e.
+a given patern in the variables will be sought in the mpml file and explored in different scenarios.
+If doing this, it is recommended to not optimise also well locations.</a:documentation>
+                <empty/>
+              </element>
+            </optional>
+            <optional>
+              <element name="Number_processors">
+                <a:documentation>Number of processors to run the ensembles. By default = 1.
+The parallelisation is done using the implementation of DEAP, which uses SCOOP.</a:documentation>
+                <ref name="integer"/>
+                <optional>
+                  <element name="MPI_runs">
+                    <a:documentation>If desired, the forward models can be run in parallel. Making each batch smaller but still using Number_processors as total.
+This is very useful if all the simulations will not fit in the available RAM or if the speed time between simulations
+can be very different and larger batches will be slowed down by the slowest simulation.
+
+WARNING THIS REQUIRES FLDECOMP TO BE INSTALLED</a:documentation>
+                    <ref name="integer"/>
+                  </element>
+                </optional>
+              </element>
+            </optional>
+            <element name="Locations_to_study">
+              <a:documentation>Specify here how many locations/wells are going to be considered</a:documentation>
+              <element name="value">
+                <ref name="integer"/>
+              </element>
+              <optional>
+                <element name="Mind_the_gap">
+                  <a:documentation>Specify here the separation between locations to study to be respected.
+The locations to study will be separated by this distance, this is to ensure
+that locations that are non suitable, for example injector and producer separated by few meters
+are not considered.</a:documentation>
+                  <ref name="integer"/>
+                </element>
+              </optional>
+              <optional>
+                <element name="Initial_guess">
+                  <a:documentation>If selected, an initial guess will be considered in the first population.
+This severely helps the convergence and it is therefore highly recommended.
+Numbers have to be separated by commas and it has to coincide with the number of variables
+to be studied in the optimisation problem times number of locations to study.
+Example with 3 variables and two locations: 2, 3, 5, 20, 30, 50</a:documentation>
+                  <data type="string"/>
+                </element>
+              </optional>
+            </element>
+            <element name="Population_generation">
+              <a:documentation>This is the population that each generation can have.
+Recommended to be a multiple of Number_processors.</a:documentation>
+              <ref name="integer"/>
+            </element>
+            <element name="Breeding_probability">
+              <a:documentation>Probability of two members to "cross" and generate offspring.
+It has to be a number between 0 and 1. For example: 0.5</a:documentation>
+              <element name="value">
+                <ref name="real"/>
+              </element>
+              <optional>
+                <element name="Generation_method">
+                  <a:documentation>By default the generation method is based on a randomise integer method.
+Here the user can specify a different method if required.
+The inputs are: TO BE DEVELOPED</a:documentation>
+                  <ref name="python_code"/>
+                </element>
+              </optional>
+            </element>
+            <element name="Mutation_probability">
+              <a:documentation>Probability of an offspring to suffer from mutation. This is useful to expand the area of search
+and avoid local minima.
+It has to be a number between 0 and 1. For example: 0.25</a:documentation>
+              <element name="value">
+                <ref name="real"/>
+              </element>
+              <optional>
+                <element name="Mutation_method">
+                  <a:documentation>By default the mutation method is based on a randomise integer method.
+Here the user can specify a different method if required.
+The inputs are: instance and mutpb. It has tor return instance.
+Return is a list containing the new Variables values.</a:documentation>
+                  <ref name="python_code"/>
+                </element>
+              </optional>
+            </element>
+            <element name="Precision">
+              <a:documentation>Percentage area of search.
+This parameters, expressed in times one, specifies the area of search based on a percentage of the Min_limit and Max_limit
+of each variables. For example, if Min_limit = -1000 and Max_Limit = 1000, for a precision of 0.1 the area of search
+will be split in sections of 200, i.e. the associated variable will only have values that are multiples of 200.</a:documentation>
+              <ref name="real"/>
+            </element>
+            <element name="Fitness">
+              <a:documentation>The fitness function specifies the functional to optimise</a:documentation>
+              <element name="Optimisation">
+                <a:documentation>Select whether to minimise the functional or maximise it.</a:documentation>
+                <choice>
+                  <element name="Minimise">
+                    <empty/>
+                  </element>
+                  <element name="Maximise">
+                    <empty/>
+                  </element>
+                </choice>
+              </element>
+              <element name="producer_ids">
+                <a:documentation>Specify here, the ids of all the boundaries that are producers, separated by commas or spaces</a:documentation>
+                <data type="string"/>
+              </element>
+              <element name="injector_ids">
+                <a:documentation>Specify here, the ids of all the boundaries that are injectors, separated by commas or spaces</a:documentation>
+                <data type="string"/>
+              </element>
+              <optional>
+                <element name="python_function">
+                  <a:documentation>If specified the written code will be used instead of the internal.
+In this code the user has access to: timeList, prod, inject, prod_temp, inject_temp and walltime (this latter is a real).
+These Numpy Arrays of size [Number of phases, # Time levels] (except timeList which is only [# Time Levels] ) are extracted from the .csv file and they combine all the production of a given phase
+through the producers/injectors,  i.e. prod = [phase1, [time 1, time 2, ...], phase2, [time 1, time 2, ...] ...].
+The user has to return a single value: val</a:documentation>
+                  <ref name="python_code"/>
+                </element>
+              </optional>
+            </element>
+            <optional>
+              <element name="GA_method">
+                <a:documentation>Specify as many variables that you want to be considered for the optimisation
+For well location you may need: X, Y, Depth, inclination, orientation
+The parameters will need to link with the method to generate different wells.</a:documentation>
+                <element name="Evolutionary_algorithm">
+                  <choice>
+                    <element name="eaSimple">
+                      <a:documentation>This algorithm reproduce the simplest evolutionary algorithm as presented in chapter 7 of [Back2000]</a:documentation>
+                      <empty/>
+                    </element>
+                    <element name="eaMuCommaLambda">
+                      <a:documentation>mu – The number of individuals to select for the next generation
+
+lambda The number of children to produce at each generation.
+
+For more information https://deap.readthedocs.io/en/master/api/algo.html
+
+Recommended mu = 1/3 of population and lambda = 2/3
+
+It is important not to have a ratio of 1 of lambda:mu</a:documentation>
+                      <element name="Mu">
+                        <ref name="integer"/>
+                      </element>
+                      <element name="Lambda">
+                        <ref name="integer"/>
+                      </element>
+                    </element>
+                    <element name="eaMuPlusLambda">
+                      <a:documentation>mu – The number of individuals to select for the next generation.
+lambda_ – The number of children to produce at each generation.
+For more information https://deap.readthedocs.io/en/master/api/algo.html</a:documentation>
+                      <element name="Mu">
+                        <ref name="integer"/>
+                      </element>
+                      <element name="Lambda">
+                        <ref name="integer"/>
+                      </element>
+                    </element>
+                  </choice>
+                </element>
+                <element name="Selection_method">
+                  <a:documentation>A selection method has to be chosen to decide the best fitted of the offspring</a:documentation>
+                  <choice>
+                    <element name="selBest">
+                      <a:documentation>Only the fittest survive</a:documentation>
+                      <empty/>
+                    </element>
+                    <element name="selNSGA2">
+                      <a:documentation>Selection based on the NSGA-II approach</a:documentation>
+                      <empty/>
+                    </element>
+                    <element name="selSPEA2">
+                      <a:documentation>Selection based on the SPEA-II approach</a:documentation>
+                      <empty/>
+                    </element>
+                  </choice>
+                </element>
+                <optional>
+                  <element name="Use_CMA">
+                    <a:documentation>Use the Covariance Matrix Adaptation Evolution Strategy (CMA-ES) [Hansen2001]</a:documentation>
+                    <element name="centroid">
+                      <a:documentation>For example: 2 times the precision</a:documentation>
+                      <ref name="integer"/>
+                    </element>
+                    <element name="sigma">
+                      <a:documentation>1/5th of the domain (area of search) is recommended</a:documentation>
+                      <ref name="integer"/>
+                    </element>
+                  </element>
+                </optional>
+              </element>
+            </optional>
+            <zeroOrMore>
+              <element name="Variables">
+                <a:documentation>Specify as many variables that you want to be considered for the optimisation
+For well location you may need: X, Y, Depth, inclination, orientation
+The parameters will need to link with the method to generate different wells.
+
+Pattern to look for in the input file to be modified. For example in the .jou file
+the X coordinate can be coded as XCORD. This has to include the number of the well location,
+if one well is present and here XCORD is specified, in the .jou file the pattern to look for will be XCORD1
+
+WARNING: CMA MAY NOT WORK PROPERLY WHEN USING ONE SINGLE VARIABLE</a:documentation>
+                <attribute name="name">
+                  <data type="string"/>
+                </attribute>
+                <attribute name="Variable_pattern">
+                  <data type="string"/>
+                </attribute>
+                <element name="Min_limit">
+                  <a:documentation>Minimum bound to be explored by the GA method.
+
+Make sure that the actual boundaries of the domain cannot be reached, a well exactly at the boundary may fail.</a:documentation>
+                  <ref name="integer"/>
+                </element>
+                <element name="Max_limit">
+                  <a:documentation>Maximum bound to be explored by the GA method.
+
+Make sure that the actual boundaries of the domain cannot be reached, a well exactly at the boundary may fail.</a:documentation>
+                  <ref name="integer"/>
+                </element>
+                <optional>
+                  <element name="normaliser">
+                    <a:documentation>If the variable needs to be evaluated in the real space, for example 0.5; The only solution is to bring
+the variable to the integer space where it can be evaluated. The recommendation is to, for example, if the variable is
+evaluated between -1 and 1 to set the normaliser to 1000 and the min_limit and max_limit to -1000 and 1000 instead of -1 and 1.
+
+The normaliser will turn the variable into the real space when evaluating it.
+
+Otherwise this variable is by default 1.0 and will have no effect.</a:documentation>
+                    <ref name="integer"/>
+                  </element>
+                </optional>
+              </element>
+            </zeroOrMore>
+            <optional>
+              <element name="Hall_of_fame">
+                <a:documentation>Lenght of the ranking of the best results to show after finishing. By default 10.</a:documentation>
+                <ref name="integer"/>
+              </element>
+            </optional>
+          </element>
+        </choice>
+      </element>
+    </element>
+  </start>
+  <define name="importance_map_options">
+    <optional>
+      <element name="avoid_perturbing_near_wells">
+        <a:documentation>a temporary option to avoid perturbing near / inside wells</a:documentation>
+        <ref name="comment"/>
+      </element>
+    </optional>
+    <element name="Output_filename">
+      <a:documentation>Output files are named according to this field. Non-standard
+characters in the simulation name should be avoided.</a:documentation>
+      <ref name="anystring"/>
+    </element>
+    <element name="Executable">
+      <a:documentation>This is the path to the executable that is going to be used.
+For example: ./icferst</a:documentation>
+      <ref name="anystring"/>
+    </element>
+    <element name="Input_file">
+      <a:documentation>This is the input filename to be used. It has to include
+the path and also the extension. Example: ./test.mpml</a:documentation>
+      <ref name="anystring"/>
+    </element>
+    <optional>
+      <element name="Time_window">
+        <a:documentation>Time-windows can be created to advance back in time in periods of time.
+This is done to create the importance map and help to improve the quality of the importance map
+in the next time-window.
+
+Specify here how the size of time-window period (time units).
+Note: This will enforce the option dump_period in ICFERST, if not using adaptive time-step size, ensure that this is a multiple of the time-step size.</a:documentation>
+        <ref name="real"/>
+        <optional>
+          <element name="pass_down_ginit">
+            <a:documentation>Enable this option to pass down G initial from a later time window to the current window.</a:documentation>
+            <ref name="comment"/>
+          </element>
+        </optional>
+      </element>
+    </optional>
+    <optional>
+      <element name="random_seed">
+        <a:documentation>Enabling this option means that the same sequence of
+random numbers will be used for an opal calculation.
+This could be useful to study the effects of certain
+options.</a:documentation>
+        <ref name="comment"/>
+      </element>
+    </optional>
+    <element name="functional">
+      <a:documentation>Enter details about the functional - currently you can choose between a functional
+that is evaluated at the end of time or one that integrates over all time</a:documentation>
+      <choice>
+        <element name="end_time">
+          <a:documentation>evaluate at the end of time</a:documentation>
+          <ref name="comment"/>
+        </element>
+        <element name="all_time">
+          <a:documentation>integrate over all time</a:documentation>
+          <ref name="comment"/>
+        </element>
+      </choice>
+      <optional>
+        <element name="square_integrand">
+          <a:documentation>this ensures that the integrand is squared in solving for the value of the functional</a:documentation>
+          <ref name="comment"/>
+        </element>
+      </optional>
+      <element name="location_of_interest">
+        <a:documentation>Location of interest. The functional will be calculated at the node nearest
+to this point. Give x y z.</a:documentation>
+        <ref name="real_vector"/>
+      </element>
+      <element name="type">
+        <choice>
+          <element name="standard">
+            <ref name="comment"/>
+          </element>
+          <element name="geothermal_over_time">
+            <ref name="comment"/>
+          </element>
+        </choice>
+      </element>
+      <oneOrMore>
+        <element name="Functional_field">
+          <a:documentation>This are the fields that the functional depends on. You can add as many as you require.
+For example: PhaseVolumeFraction, Density, Pressure, Velocity, Permeability, etc.</a:documentation>
+          <attribute name="name">
+            <data type="string"/>
+          </attribute>
+          <element name="field_type">
+            <a:documentation>Type of field. For example PhaseVolumeFraction is a scalar field.</a:documentation>
+            <choice>
+              <element name="scalar_field">
+                <ref name="comment"/>
+              </element>
+              <element name="vector_field">
+                <ref name="comment"/>
+              </element>
+              <element name="tensor_field">
+                <ref name="comment"/>
+              </element>
+            </choice>
+          </element>
+          <optional>
+            <element name="phase">
+              <a:documentation>If relevant, which phase is of interest?</a:documentation>
+              <ref name="integer"/>
+            </element>
+          </optional>
+        </element>
+      </oneOrMore>
+    </element>
+    <oneOrMore>
+      <element name="Field_to_study">
+        <a:documentation>This are the fields to study. You can add as many as you require.
+For example: PhaseVolumeFraction, Density, Pressure, Velocity, Permeability, etc.</a:documentation>
+        <attribute name="name">
+          <data type="string"/>
+        </attribute>
+        <element name="field_type">
+          <a:documentation>Type of field. For example PhaseVolumeFraction is a scalar field.</a:documentation>
+          <choice>
+            <element name="scalar_field">
+              <ref name="comment"/>
+            </element>
+            <element name="vector_field">
+              <ref name="comment"/>
+            </element>
+            <element name="tensor_field">
+              <ref name="comment"/>
+            </element>
+            <element name="porous_media">
+              <choice>
+                <element name="scalar_field">
+                  <ref name="comment"/>
+                </element>
+                <element name="vector_field">
+                  <ref name="comment"/>
+                </element>
+                <element name="tensor_field">
+                  <ref name="comment"/>
+                </element>
+              </choice>
+            </element>
+          </choice>
+        </element>
+        <element name="perturbations_to_do">
+          <a:documentation>Number perturbation to induce to this field.</a:documentation>
+          <ref name="integer"/>
+          <optional>
+            <element name="parallel_processors">
+              <a:documentation>Number of CPUs to use to run perturbation in parallel.
+The number of perturbation will be rounded up to be multiple of this.</a:documentation>
+              <ref name="integer"/>
+            </element>
+          </optional>
+        </element>
+        <optional>
+          <element name="Initial_condition">
+            <a:documentation>Perturbate the initial condition?.
+If neither this nor the Boundary are selected this one is on by default.</a:documentation>
+            <ref name="comment"/>
+          </element>
+        </optional>
+        <optional>
+          <element name="Boundary_condition">
+            <a:documentation>Perturbate the boundary conditions?</a:documentation>
+            <ref name="comment"/>
+            <optional>
+              <element name="boundary_ids">
+                <a:documentation>Select which boundary conditions you want to perturbate.
+By default all the boundary conditions.</a:documentation>
+                <ref name="integer_vector"/>
+              </element>
+            </optional>
+          </element>
+        </optional>
+        <optional>
+          <element name="Gram-Schmidt">
+            <a:documentation>Apply Gram-Schmidt orthoganlisation to the initial conditions with
+this option.</a:documentation>
+            <ref name="comment"/>
+          </element>
+        </optional>
+        <optional>
+          <element name="smoothing">
+            <a:documentation>Apply smoothing to the perturbations with this option. Enter the number
+of smoothing sweeps. (One sweep and the information spreads out by one node,
+two sweeps spreads out by two nodes etc.)
+A possible rule: nSmooth = nNodes^(1/d)/4 .</a:documentation>
+            <ref name="integer"/>
+          </element>
+        </optional>
+        <optional>
+          <element name="use_G">
+            <a:documentation>Feedback of importance map. Multiply the perturbed initial condition by the
+current importance map (based on however many perturbations have been run at
+this point). Enter an integer to determine after how many ensembles this should
+begin (choose 0 for immediately, n for once n ensembles have run).</a:documentation>
+            <ref name="integer"/>
+          </element>
+        </optional>
+        <choice>
+          <element name="Sigma">
+            <a:documentation>This is the standard deviation of the normal distribution
+to perturbate the studied field. The perturbation can either
+or an absolute value. By default is relative and 0.01.</a:documentation>
+            <ref name="real"/>
+          </element>
+          <element name="python_function">
+            <a:documentation>Python function to introduce the perturbation manually;
+The user has access to:
+field which is input/output and contains the values of the field of interest
+coordinates which are the coordinates
+The user has access to the python libraries.
+Example (NOTE that the code has to start with no indentations):
+
+    sigma = 0.01
+    mu = 0.
+    for i in range(field.shape[0]):
+         field[i] *= np.random.normal(mu, sigma)
+
+    #Simple smoothing step based on the distance to the node
+    field_copy = copy.deepcopy(field)
+    ref_dist = np.linalg.norm(np.amax(coordinates)-np.amin(coordinates))
+
+    for i in range(field.shape[0]):
+         for x in range(coordinates.shape[0]):
+              dist = np.linalg.norm(coordinates[i]-coordinates[x])
+              if (abs(dist) &gt;1e-8 ):
+                   field[i] = field_copy[i] + field_copy[x]*max(0.5, ref_dist/dist)</a:documentation>
+            <ref name="python_code"/>
+          </element>
+        </choice>
+        <element name="Phases_to_perturb">
+          <a:documentation>List of phases that are going to be perturbed for this field.</a:documentation>
+          <ref name="integer_vector"/>
+        </element>
+        <optional>
+          <element name="stabilise_through_diagonal">
+            <a:documentation>Modifies the diagonal terms of the MTM matrix to assist
+in inverting the matrix when it might be poorly conditioned.
+Method 1, add_to_diag, (default) adds a small value to each
+diagonal term (try 1e-8).
+Method 2, constrain_evalue, specifies a lower bound for the
+eigenvalues of MTM (try 1e-2).</a:documentation>
+            <choice>
+              <element name="add_to_diag">
+                <ref name="comment"/>
+              </element>
+              <element name="constrain_evalue">
+                <ref name="comment"/>
+              </element>
+            </choice>
+            <element name="epsilon">
+              <ref name="real"/>
+            </element>
+          </element>
+        </optional>
+      </element>
+    </oneOrMore>
+  </define>
+  <define name="nirom_options">
+    <choice>
+      <element name="snapshots_create">
+        <a:documentation>choose between generating snapshots and accessing pre-existing ones</a:documentation>
+        <ref name="comment"/>
+        <element name="path">
+          <a:documentation>Give the directory in which to put the snapshots</a:documentation>
+          <ref name="anystring"/>
+        </element>
+        <element name="executable">
+          <a:documentation>Give the path to the executable of the forward model</a:documentation>
+          <data type="string"/>
+        </element>
+        <element name="input_file">
+          <a:documentation>Give the name of the input file of the forward model</a:documentation>
+          <ref name="anystring"/>
+        </element>
+      </element>
+      <element name="snapshots_location">
+        <a:documentation>access pre-existing snapshots</a:documentation>
+        <ref name="comment"/>
+        <element name="path">
+          <a:documentation>Give the path to where the snapshots are stored</a:documentation>
+          <ref name="anystring"/>
+        </element>
+        <element name="input_file">
+          <a:documentation>Give the name of the input file used to generate the snapshots</a:documentation>
+          <ref name="anystring"/>
+        </element>
+        <optional>
+          <element name="output_filebase">
+            <a:documentation>Give the name of the output files</a:documentation>
+            <ref name="anystring"/>
+          </element>
+        </optional>
+        <optional>
+          <element name="nParameters">
+            <a:documentation>Number of parameters</a:documentation>
+            <ref name="integer"/>
+          </element>
+        </optional>
+        <optional>
+          <element name="extension">
+            <a:documentation>Give the filename extension of the snapshots</a:documentation>
+            <ref name="anystring"/>
+          </element>
+        </optional>
+      </element>
+    </choice>
+    <optional>
+      <element name="compression">
+        <a:documentation>Apply compression to the snapshots with an SVD, an auto-encoder or a mixture of both (svd-autoencoder)</a:documentation>
+        <group>
+          <ref name="comment"/>
+          <choice>
+            <element name="svd_type">
+              <a:documentation>Choose compression method: svd type (with svd or eigh) or auto-encoder type. There is
+an option to include an auto-encoder with the svd type</a:documentation>
+              <ref name="comment"/>
+              <choice>
+                <a:documentation>svd method can be used for small problems (200,000 dofs and 20 snapshots), but
+eigh is faster for larger problems.</a:documentation>
+                <element name="eigh_method">
+                  <ref name="comment"/>
+                </element>
+                <element name="svd_method">
+                  <ref name="comment"/>
+                </element>
+                <element name="DD_eigh_method">
+                  <ref name="comment"/>
+                  <element name="num_sub_base_2">
+                    <ref name="integer"/>
+                  </element>
+                </element>
+              </choice>
+              <optional>
+                <!--  ( -->
+                <element name="svd_autoencoder">
+                  <a:documentation>Once the SVD has been calculated, send the POD variables through an auto-encoder.</a:documentation>
+                  <ref name="comment"/>
+                  <element name="number_epochs">
+                    <a:documentation>Similar to iteration number</a:documentation>
+                    <ref name="integer"/>
+                  </element>
+                  <element name="batch_size">
+                    <a:documentation>how many snapshots (inputs) should be used before updating the weights. The
+larger this number the faster to train the auto-encoder, but it might become
+less accurate</a:documentation>
+                    <ref name="integer"/>
+                  </element>
+                  <element name="neurons_each_layer">
+                    <a:documentation>How many neurons there are in each layer - start with the number of nodes and
+end with the number of latent variables . (There is a default number of layers)</a:documentation>
+                    <ref name="integer_vector"/>
+                  </element>
+                </element>
+              </optional>
+              <oneOrMore>
+                <!-- ), -->
+                <element name="field_name">
+                  <a:documentation>Give the field name for which you want basis functions to be calculated.</a:documentation>
+                  <attribute name="name">
+                    <data type="string"/>
+                  </attribute>
+                  <choice>
+                    <element name="cumulative_tol">
+                      <a:documentation>Give the fraction of information (energy) to be captured by
+the basis functions (eg. 0.99).</a:documentation>
+                      <ref name="real"/>
+                    </element>
+                    <element name="nPOD">
+                      <a:documentation>Give the number of basis functions to be retained (from 1 up to
+the number of snapshots)</a:documentation>
+                      <ref name="integer"/>
+                    </element>
+                  </choice>
+                </element>
+              </oneOrMore>
+            </element>
+            <element name="autoencoder_type">
+              <a:documentation>Choose compression method: svd type (with svd or eigh) or auto-encoder type. There is
+an option to include an auto-encoder with the svd type</a:documentation>
+              <ref name="comment"/>
+              <oneOrMore>
+                <element name="field_name">
+                  <attribute name="name">
+                    <data type="string"/>
+                  </attribute>
+                  <element name="batch_size">
+                    <a:documentation>how many snapshots (inputs) should be used before updating the weights. The
+larger this number the faster to train the auto-encoder, but it might become
+less accurate</a:documentation>
+                    <ref name="integer"/>
+                  </element>
+                  <element name="number_epochs">
+                    <a:documentation>Similar to iteration number</a:documentation>
+                    <ref name="integer"/>
+                  </element>
+                  <element name="neurons_each_layer">
+                    <a:documentation>How many neurons there are in each layer - start with the number of nodes and
+end with the number of latent variables . (There is a default number of layers)</a:documentation>
+                    <ref name="integer_vector"/>
+                  </element>
+                </element>
+              </oneOrMore>
+            </element>
+          </choice>
+        </group>
+        <!--
+                 element field_name {
+                    attribute name { string },
+                       (## Give the fraction of information (energy) to be captured by
+                       ## the basis functions (eg. 0.99).
+                       element cumulative_tol{real}|
+                       ## Give the number of basis functions to be retained (from 1 up to
+                       ## the number of snapshots)
+                       element nPOD{integer}
+                       )   }+
+        -->
+      </element>
+    </optional>
+    <!--
+      to include another element try putting parentheses around choose compression method and above
+         }),
+         element placeholder{comment}
+        )?,
+    -->
+    <optional>
+      <element name="training">
+        <a:documentation>training - choose between Gaussian Process Regression or LSTM</a:documentation>
+        <ref name="comment"/>
+        <choice>
+          <element name="GPR">
+            <a:documentation>scaling and hyperparameters (a constant kernel multiplies an RBF kernel)</a:documentation>
+            <ref name="comment"/>
+            <element name="scaling_bounds">
+              <a:documentation>scaling of the data</a:documentation>
+              <ref name="real_vector"/>
+            </element>
+            <element name="constant_value">
+              <ref name="real"/>
+            </element>
+            <element name="constant_bounds">
+              <ref name="real_vector"/>
+            </element>
+            <element name="RBF_length_scale">
+              <ref name="real"/>
+            </element>
+            <element name="RBF_length_scale_bounds">
+              <ref name="real_vector"/>
+            </element>
+          </element>
+          <element name="DD_GPR">
+            <ref name="comment"/>
+            <element name="scaling_bounds">
+              <a:documentation>scaling of the data</a:documentation>
+              <ref name="real_vector"/>
+            </element>
+            <element name="constant_value">
+              <ref name="real"/>
+            </element>
+            <element name="constant_bounds">
+              <ref name="real_vector"/>
+            </element>
+            <element name="RBF_length_scale">
+              <ref name="real"/>
+            </element>
+            <element name="RBF_length_scale_bounds">
+              <ref name="real_vector"/>
+            </element>
+          </element>
+          <element name="LSTM">
+            <a:documentation>method - Choose between GPR and LSTM</a:documentation>
+            <ref name="comment"/>
+          </element>
+          <element name="DD_LSTM">
+            <ref name="comment"/>
+          </element>
+        </choice>
+      </element>
+    </optional>
+    <optional>
+      <element name="prediction">
+        <a:documentation>prediction - not implemented yet</a:documentation>
+        <ref name="comment"/>
+        <element name="nTime">
+          <a:documentation>number of time levels to predict over - this should be a positive integer</a:documentation>
+          <ref name="integer"/>
+        </element>
+      </element>
+    </optional>
+  </define>
+</grammar>
+<!--
+       ## tolerance for SVD truncation
+       element cumulative_tol { real }
+-->

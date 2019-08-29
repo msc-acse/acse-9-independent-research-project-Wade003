@@ -1,0 +1,4 @@
+ MESSAGE: Using default options for the linear solver: GMRES(30) + HYPRE
+Running the model
+P2 TOL= 150 , ERROR= 37.2837382503
+CWC works OK
