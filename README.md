@@ -116,5 +116,13 @@ __CID:__ 01569843
 
 This project is completed for Imperial College's MSc in Applied Computational Science and Engineering program,
 as part of the final course module ACSE9. This project was completed under the supervision of Professor Christopher Pain. 
+## To markers:
+My code is in software/Opal-master
+f2py.py  LSTM_DD.py  LSTM_Global.py  nirom.py(part)  nirom_LSTM_tools.py  nirom_tools.py(part)  opal_classes.py(part)
+
+And in software/Opal-master/schemas
+opal.rnc(part)
+
+The other code is pre-existing
 ## License  
 Licensed under the MIT [license](https://github.com/msc-acse/acse-9-independent-research-project-Wade003/blob/master/LICENSE)

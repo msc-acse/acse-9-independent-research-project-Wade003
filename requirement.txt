@@ -3,7 +3,6 @@ numpy >= 1.16.4
 scipy >= 1.2.2
 matplotlib >= 3.1.0
 jupyter >= 1.0.0 (to run demo notebooks)
-Sphinx >= 1.8.5 (to compile documentation)
 Keras >= 2.2.4
 scikit-learn >= 0.20.3
 tensorflow >= 1.14.0
