@@ -2,6 +2,10 @@
 Reduced order modelling is a powerful technique for rapidly modelling high dimensional fluid dynamics systems.
 Its speed could enable real-time decision making and operational modelling.
 
+<img src="images/fpc_original.png" title="Flow past a cylinder" width="400" height="300" /><img src="imgs/fpc_lstm.png" title="Prediction by LSTM, flow past a cylinder" width="400" height="300" />
+
+<img src="images/3d_origin.png" title="3D London South Bank University original data at a cut plane" width="400" height="300" /><img src="imgs/3d_gpr.png" title="Replication by GPR for 3D London South Bank University at a cut plane" width="400" height="300" />
+
 In this repository you can find the tools for reduced order modelling.
 
 The follow test case are in this repository, including:
@@ -67,7 +71,7 @@ Adding environment path for Opal and IC-Ferst
 
 ## Dependencies
  The external libraries:
-
+ - python 2.7 (Recommand)
  - numpy >= 1.16.4
  - scipy >= 1.2.2
  - matplotlib >= 3.1.0
