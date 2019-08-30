@@ -2,8 +2,10 @@
 Reduced order modelling is a powerful technique for rapidly modelling high dimensional fluid dynamics systems.
 Its speed could enable real-time decision making and operational modelling.
 
+- Results from LSTM and DD-GPR, 2D flow past a cyliner
 <img src="images/lstm_gif.gif" title="Prediction by LSTM for flow past a cylinder" width="400" height="80" /> <img src="images/dd_gpr_gif.gif" title="Replication by DD-GPR, flow past a cylinder" width="400" height="80" />
 
+- 3D London South Bank University original data and GPR's result on a cut plane
 <img src="images/3d_origin.png" title="3D London South Bank University original data at a cut plane" width="400" height="400" /> <img src="images/3d_gpr.png" title="Replication by GPR for 3D London South Bank University at a cut plane" width="400" height="400" />
 
 In this repository you can find the tools for reduced order modelling.
