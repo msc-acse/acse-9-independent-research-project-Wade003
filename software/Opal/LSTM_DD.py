@@ -60,23 +60,14 @@ def LSTM_train(dd_pod_coeffs_all, history_level, local_list, order):
                     null_list.append(dd_pod_coeffs_all[local_input][step + i])
                 # null_list.append(dd_pod_coeffs_all[local_list[sub][0]][step + i])
                 x_np.append(null_list)
-            #print("np.array(x_np)",np.array(x_np).shape)
 
             x = Variable(torch.from_numpy(np.array(x_np)).float())
             for local_input in local_list[sub]:
                 y_np[0].append(dd_pod_coeffs_all[local_input][step + history_level])
-            #print("np.array(y_np)",np.array(y_np).shape)
-            # y_np.append(dd_pod_coeffs_all[sub][step + history_level])
-            #print("x", x.size())
-            #print("y", np.array(y_np).shape)
             y = Variable(torch.from_numpy(np.array(y_np)).float())
-            # x = x.permute(1,2,0).view(-1, nodes_number*len(local_list[sub]), history_level)
             x = x.permute(1,2,0).view(-1, nodes_number*len(local_list[sub]), history_level)
             y = y.permute(1,2,0).view(-1, nodes_number, 1)
-            #print("x", x.size())
-            #print("y", y.size())
             prediction = lstmNN[sub](x)
-            #prediction_list.append(prediction.data.view(nodes_number*len(local_list[sub])).numpy())
             loss = loss_func(prediction, y)
             optimizer[sub].zero_grad()
             loss.backward()
@@ -195,7 +186,6 @@ def LSTM_predict(dd_pod_coeffs_all, history_level, lstmNN, time_steps, local_lis
             x = x.permute(1,2,0).view(1, nodes_number*len(local_list[sub]), history_level)
             with torch.no_grad():
                 prediction = lstmNN[sub](x)
-            print("prediction",prediction.size())
             prediction_list[sub].append(prediction.data.view(nodes_number).numpy()[:nodes_number])
             #print("length", len(prediction_list))
     return np.array(prediction_list)
@@ -251,7 +241,6 @@ def LSTM_DD_global_predict(dd_pod_coeffs_all, history_level, lstmNN, time_steps,
         elif(step >= history_level):
             for i in range(history_level):
                 x_np.append(prediction_list[-history_level+i])
-        print("x_np", type(x_np))
         x = Variable(torch.from_numpy(np.array(x_np)).float())
         x = x.permute(1,2,0).view(1, nodes_number * n_sub, history_level)
         with torch.no_grad():

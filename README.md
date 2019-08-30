@@ -13,8 +13,8 @@ The follow test case are in this repository, including:
  - A 1D square wave training by DD-LSTM (see: test_cases/square_wave/square_wave_dd_lstm.py)
  - A 2D flow past a cylinder test case using LSTM (see: test_cases/LSTM_fpc)
  - A 2D flow past a cylinder test case using GPR (see: test_cases/GPR_fpc)
- - A 2D flow past a cylinder test case using DD-LSTM (see: test_cases/DD_LSTM_fpc)
- - A 2D flow past a cylinder test case using DD-LSTM (see: test_cases/DD_GPR_fpc)
+ - A 2D flow past a cylinder test case using DD-LSTM (see: test_cases/DD_LSTM_fpc) (not recommand, discussed in report)
+ - A 2D flow past a cylinder test case using DD-GPR (see: test_cases/DD_GPR_fpc)
  
 The test case for 3D problem is too large to be here. To run that test case, you need to:
 
@@ -72,9 +72,9 @@ Installing all packages below.
 ```
 Adding environment path for Opal and IC-Ferst
 ```bash
-   export PYTHONPATH='[path_to_this_repo]/software/multifluids_icferst-master/python:$PYTHONPATH'
-   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:[path_to_this_repo]/software/Opal-master/spud
-   export PATH="[path_to_this_repo]/software/Opal-master/spud:$PATH"
+   export PYTHONPATH='[path_to_this_repo]/software/multifluids_icferst/python:$PYTHONPATH'
+   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:[path_to_this_repo]/software/Opal/spud
+   export PATH="[path_to_this_repo]/software/Opal/spud:$PATH"
 ```
 
 ## Dependencies
@@ -101,7 +101,7 @@ Adding environment path for Opal and IC-Ferst
 ## Instructions to run a test case
 In the root directory of this repository
 ```bash 
-   diamond -s ../software/Opal-master/schemas/opal.rng fpc_nirom.opal
+   diamond -s ../software/Opal/schemas/opal.rng fpc_nirom.opal
 ```
 The file name(fpc_nirom.opal) should be changed to the opal file's name in another test case. As for the configuration of 2D problem, I recommend to remain the same; if you do need you change it and still want to test a 2D test case, you can change the nPOD in field\_name(Velocity) in svd\_type in compression. But too many or two small POD number would affect the performance.
 
@@ -109,7 +109,7 @@ Another setting could be changed is to change the training method from LSTM to G
 
 Run the model:
 ```bash 
-   python2 ../software/Opal-master/opal.py fpc_nirom.opal
+   python2 ../software/Opal/opal.py fpc_nirom.opal
 ```
 Visualize the result:
 ```bash 
@@ -124,11 +124,12 @@ __CID:__ 01569843
 
 This project is completed for Imperial College's MSc in Applied Computational Science and Engineering program,
 as part of the final course module ACSE9. This project was completed under the supervision of Professor Christopher Pain. 
-## To markers:
-My code is in software/Opal-master
+## To Markers:
+My major development is in software/Opal
+
 f2py.py  LSTM_DD.py  LSTM_Global.py  nirom.py(part)  nirom_LSTM_tools.py  nirom_tools.py(part)  opal_classes.py(part)
 
-And in software/Opal-master/schemas
+And in software/Opal/schemas
 opal.rnc(part)
 
 The other code is pre-existing

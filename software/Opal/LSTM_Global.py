@@ -58,6 +58,7 @@ def LSTM_train(pod_coeffs_all, history_level = 1):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+    print("LSTM training finished")
     return lstmNN
 
 def LSTM_predict(pod_coeffs_all, history_level, lstmNN, time_steps):
@@ -83,5 +84,5 @@ def LSTM_predict(pod_coeffs_all, history_level, lstmNN, time_steps):
         with torch.no_grad():
             prediction = lstmNN(x)
         prediction_list.append(prediction.data.view(nodes_number).numpy())
-        #print("length", len(prediction_list))
+        #print("LSTM_predicting finished")
     return prediction_list
