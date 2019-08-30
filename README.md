@@ -17,14 +17,22 @@ The follow test case are in this repository, including:
  - A 2D flow past a cylinder test case using DD-LSTM (see: test_cases/DD_GPR_fpc)
  
 The test case for 3D problem is too large to be here. To run that test case, you need to:
+
 Install Putty (from: https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
+
 Install Xming (from: https://netix.dl.sourceforge.net/project/xming/Xming/6.9.0.31/Xming-6-9-0-31-setup.exe)
-Open Putty
+
+Open Putty.
 Set host name as: ese-theos.ese.ic.ac.uk
-Set Connection/SSH/X11, Enable X11 forwarding
-Open Putty and login
+
+Set Connection/SSH/X11, Enable X11 forwarding.
+
+Open Putty and login.
+
 Ask for account and password from e-mail: ys8718@ic.ac.uk
+
 After logging in:
+
 ```bash
   cd /data/wade/test/Opal-master/tests/
   cd GPR_LSBU
@@ -64,9 +72,9 @@ Installing all packages below.
 ```
 Adding environment path for Opal and IC-Ferst
 ```bash
-   export PYTHONPATH='/data/wade/test/multifluids_icferst-master/python:$PYTHONPATH'
-   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/data/wade/test/Opal-master/spud
-   export PATH="/data/wade/test/Opal-master/spud:$PATH"
+   export PYTHONPATH='[path_to_this_repo]/software/multifluids_icferst-master/python:$PYTHONPATH'
+   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:[path_to_this_repo]/software/Opal-master/spud
+   export PATH="[path_to_this_repo]/software/Opal-master/spud:$PATH"
 ```
 
 ## Dependencies
