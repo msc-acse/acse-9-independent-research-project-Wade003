@@ -27,7 +27,7 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 #    USA
 
-#Authors: Claire Heaney, Pablo Salinas, Dunhui Xiao, Christopher Pain
+#Author: Wade Song
 
 import numpy as np
 import sys
