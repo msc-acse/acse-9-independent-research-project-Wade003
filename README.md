@@ -64,9 +64,9 @@ Installing all packages below.
 ```
 Adding environment path for Opal and IC-Ferst
 ```bash
-   export PYTHONPATH='/data/wade/test/multifluids_icferst-master/python:$PYTHONPATH'
-   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/data/wade/test/Opal-master/spud
-   export PATH="/data/wade/test/Opal-master/spud:$PATH"
+   export PYTHONPATH='[path_to_this_repo]/software/multifluids_icferst-master/python:$PYTHONPATH'
+   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:[path_to_this_repo]/software/Opal-master/spud
+   export PATH="[path_to_this_repo]/software/Opal-master/spud:$PATH"
 ```
 
 ## Dependencies
