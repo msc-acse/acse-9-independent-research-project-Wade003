@@ -127,7 +127,10 @@ __Github:__ Wade003
 __CID:__ 01569843
 
 This project is completed for Imperial College's MSc in Applied Computational Science and Engineering program,
-as part of the final course module ACSE9. This project was completed under the supervision of Professor Christopher Pain. 
+as part of the final course module ACSE9. 
+
+This project was completed under the supervision of Professor Christopher Pain. 
+
 ## To Markers:
 My major development is in software/Opal
 
