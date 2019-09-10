@@ -105,7 +105,7 @@ Adding environment path for Opal and IC-Ferst
 ## Instructions to run a test case
 In the root directory of this repository
 ```bash 
-   diamond -s ../software/Opal/schemas/opal.rng fpc_nirom.opal
+   diamond -s ../../software/Opal/schemas/opal.rng fpc_nirom.opal
 ```
 The file name(fpc_nirom.opal) should be changed to the opal file's name in another test case. As for the configuration of 2D problem, I recommend to remain the same; if you do need you change it and still want to test a 2D test case, you can change the nPOD in field\_name(Velocity) in svd\_type in compression. But too many or two small POD number would affect the performance.
 
@@ -113,7 +113,7 @@ Another setting could be changed is to change the training method from LSTM to G
 
 Run the model:
 ```bash 
-   python2 ../software/Opal/opal.py fpc_nirom.opal
+   python2 ../../software/Opal/opal.py fpc_nirom.opal
 ```
 Visualize the result:
 ```bash 
